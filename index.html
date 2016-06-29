@@ -7,38 +7,48 @@
 		background-color:black;
 	}
 	#container{
-		background: url('background.jpg');
+		background: url('img/background.jpg');
 		width:1000px;
 		height:550px;
 	}
 	#hero{
-		background: url('1942.gif');
+		background: url('img/1942.gif');
 		background-position: -85px -180px;
 		width:28px;
 		height:28px;
 		position:absolute;
 	}
 	.enemy1{
-		background: url('1942.gif');
+		background: url('img/1942.gif');
 		background-position: -30px -10px;
 		width:28px;
 		height:28px;
 		position:absolute;
 	}
     .specialenemies1{
-		background: url('1942.gif');
+		background: url('img/1942.gif');
 		background-position: -150px -10px;
 		width:25px;
 		height:17px;
 		position:absolute;
     }
 	.bullets{
-		background: url('1942.gif');
+		background: url('img/1942.gif');
 		background-position: -185px -400px;
 		width:18px;
 		height:18px;
 		position:absolute;
 	}
+    .explosions1{
+        background: url('img/explosion.gif');
+        background-size: cover;
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        top: 650px;
+        left: 50px;
+        z-index: 9999999999;
+    }
 	#score{
 		position:absolute;
 		border:10px solid red;
@@ -59,6 +69,8 @@
 		<div id='enemies'></div>
 		
 		<div id="specialenemies"></div>
+		
+		<div id="explosions"></div>
 		
 		<div id='bullets'>
 			<div class='bullet' style='top:150px; left:200px;'></div>
@@ -108,7 +120,8 @@
     ]
     var bullets = [];
     var score = 0;
-    
+    //var explosions = [];
+    var explosion_i = 0;
     
 //    DISPLAY ENEMIES
     function displayEnemies(){
@@ -192,26 +205,76 @@
         displayHero();
     }
 
+//    EXPLOSIONS
+    function createExplosion(){
+        enemies[i]
+    }
     
+    
+//    COLLISION DETECTION
+//    ENEMIES & BULLETS
     function detectCollision(){
         for(var i=0; i<bullets.length; i++){
             for(var j=0; j<enemies.length; j++){
                 if( Math.abs(bullets[i].x - enemies[j].x) < 10 && Math.abs(bullets[i].y - enemies[j].y) < 10){
                     score += 10;
+                    var mydiv = document.createElement("div");
+                    mydiv.style.top = enemies[j].y+"px";
+                    mydiv.style.left = enemies[j].x+"px";
+                    mydiv.className = "explosions1";
+                    
+                    document.getElementById('explosions').appendChild(mydiv);
+                    
+                    setTimeout(function() {
+                        mydiv.parentNode.removeChild(mydiv);
+                    }, 800);
+                    enemies.splice(j, 1);
+                }
+            }
+            for(var j=0; j<specialenemies.length; j++){
+                if( Math.abs(bullets[i].x - specialenemies[j].x) < 10 && Math.abs(bullets[i].y - specialenemies[j].y) < 10){
+                    score += 10;
+                    var mydiv = document.createElement("div");
+                    mydiv.style.top = specialenemies[j].y+"px";
+                    mydiv.style.left = specialenemies[j].x+"px";
+                    mydiv.className = "explosions1";
+
+                    document.getElementById('explosions').appendChild(mydiv);
+
+                    setTimeout(function() {
+                        mydiv.parentNode.removeChild(mydiv);
+                    }, 800);
+                    specialenemies.splice(j, 1);
                 }
             }
         }
+//        ENEMIES & HERO
         for(var i=0; i<enemies.length; i++){
             if(Math.abs(enemies[i].x - hero.x) < 10 && Math.abs(enemies[i].y - hero.y) < 10){
                 score -= 500;
             }
         }
+//        SPECIAL ENEMIES & HERO
         for(var i=0; i<specialenemies.length; i++){
             if(Math.abs(specialenemies[i].x - hero.x) < 10 && Math.abs(specialenemies[i].y - hero.y) < 10){
                 score -= 500;
             }
         }
     }
+    
+    function explosionRemoval(){
+        return;
+        if(explosions.length>0){
+            var elem = document.getElementById(explosions[explosions.length-1]);
+            console.log(explosions);
+            console.log(elem);
+            explosions.pop();
+            setTimeout(function(){ elem.remove(); }, 800);
+        }
+    }
+    
+    
+    
     
     function displayScore(){
         document.getElementById('score').innerHTML = score;
@@ -229,6 +292,7 @@
         displayBullets();
         detectCollision();
         displayScore();
+        explosionRemoval();
     }
     
 
