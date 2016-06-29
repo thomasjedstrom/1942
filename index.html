@@ -25,6 +25,13 @@
 		height:28px;
 		position:absolute;
 	}
+    .specialenemies1{
+		background: url('1942.gif');
+		background-position: -150px -10px;
+		width:25px;
+		height:17px;
+		position:absolute;
+    }
 	.bullets{
 		background: url('1942.gif');
 		background-position: -185px -400px;
@@ -51,6 +58,8 @@
 		
 		<div id='enemies'></div>
 		
+		<div id="specialenemies"></div>
+		
 		<div id='bullets'>
 			<div class='bullet' style='top:150px; left:200px;'></div>
 			<div class='bullet' style='top:250px; left:200px;'></div>
@@ -59,14 +68,20 @@
 		</div>	
 	</div>
 
-	<div id='score'>100</div>
+	<div id='score'>0</div>
 
 
     1.  display the hero - DONE
     2.  make the hero move up/down/left/right - DONE
     3.  display all the enemies - DONE
-    4.  make the endemies move
-    5.  when spacebar is pressed, have the hero shoot a bullet
+    4.  make the enemies move - DONE
+    5.  when spacebar is pressed, have the hero shoot a bullet - DONE
+    6.  get another type of enemy to display - DONE
+    7.  if hero colides with enemy, lose 500 points - DONE
+    8.  when enemy gets shot, score goes up 10 points - DONE
+    
+    9.  when enemy gets shot, it blows up
+    10. trigger explosion noise when enemy blows up
 
 
 
@@ -78,15 +93,21 @@
         y: 500
     }
     var enemies = [
-                    {x:50, y:50},
-                    {x:150, y:50},
-                    {x:250, y:50},
-                    {x:350, y:50},
-                    {x:450, y:50},
-                    {x:550, y:50},
-                    {x:650, y:50},
-                  ];
+        {x:50, y:50},
+        {x:150, y:150},
+        {x:250, y:75},
+        {x:350, y:250},
+        {x:450, y:125},
+        {x:650, y:75},
+        {x:750, y:50},
+    ];
+    var specialenemies = [
+        {x:400, y: 1},
+        {x:100, y: 30},
+        {x:700, y: 80}
+    ]
     var bullets = [];
+    var score = 0;
     
     
 //    DISPLAY ENEMIES
@@ -97,6 +118,14 @@
         }
         document.getElementById('enemies').innerHTML = output;
     }
+//    DISPLAY Special ENEMIES
+    function displaySpecialEnemies(){
+        var output = '';
+        for(var i=0; i<specialenemies.length; i++){
+            output += "<div class='specialenemies1' style='top:"+specialenemies[i].y+"px; left:"+specialenemies[i].x+"px;'></div>";
+        }
+        document.getElementById('specialenemies').innerHTML = output;
+    }
     
 //    DESPLAY HERO
     function displayHero(){
@@ -104,13 +133,26 @@
         document.getElementById('hero').style['left'] = hero.x + "px";
     }
     
+//    MOVE ENEMIES
     function moveEnemies(){
         for(var i=0; i<enemies.length; i++){
             enemies[i].y += 5;
             
             if(enemies[i].y > 540){
                 enemies[i].y = 0;
-                enemies[i].x = Math.random()*500;
+                enemies[i].x = Math.random()*700;
+            }
+        }
+    }
+    
+//    MOVE Special ENEMIES
+    function moveSpecialEnemies(){
+        for(var i=0; i<specialenemies.length; i++){
+            specialenemies[i].y += 7;
+            
+            if(specialenemies[i].y > 540){
+                specialenemies[i].y = 0;
+                specialenemies[i].x = Math.random()*700;
             }
         }
     }
@@ -137,13 +179,13 @@
 //    HERO MOVEMENT
     document.onkeydown = function(a) {
         if(a.keyCode == 37){
-            hero.x -= 10;
+            hero.x -= 15;
         }else if(a.keyCode == 39){
-            hero.x +=10;
+            hero.x +=15;
         }else if(a.keyCode == 38){
-            hero.y -=10;
+            hero.y -=15;
         }else if(a.keyCode == 40){
-            hero.y +=10;
+            hero.y +=15;
         } else if(a.keyCode == 32){
             bullets.push({x: hero.x+8, y: hero.y-15});
         }
@@ -151,26 +193,42 @@
     }
 
     
-//    function detectCollision(){
-//        for(var i=0; i<bullets.length; i){
-//            console.log(i);
-//            for(var j=0; j<enemies.length; j++){
-//                if( Math.abs(bullets[i].x - enemies[j].x) < 5 && Math.abs(bullets[i].y - enemies[j].y) < 5){
-//                    console.log('bang')
-//                }
-//            }
-//        }
-//    }
+    function detectCollision(){
+        for(var i=0; i<bullets.length; i++){
+            for(var j=0; j<enemies.length; j++){
+                if( Math.abs(bullets[i].x - enemies[j].x) < 10 && Math.abs(bullets[i].y - enemies[j].y) < 10){
+                    score += 10;
+                }
+            }
+        }
+        for(var i=0; i<enemies.length; i++){
+            if(Math.abs(enemies[i].x - hero.x) < 10 && Math.abs(enemies[i].y - hero.y) < 10){
+                score -= 500;
+            }
+        }
+        for(var i=0; i<specialenemies.length; i++){
+            if(Math.abs(specialenemies[i].x - hero.x) < 10 && Math.abs(specialenemies[i].y - hero.y) < 10){
+                score -= 500;
+            }
+        }
+    }
+    
+    function displayScore(){
+        document.getElementById('score').innerHTML = score;
+    }
     
     
     
     function gameLoop(){
         displayHero();
         moveEnemies();
+        moveSpecialEnemies();
         displayEnemies();   
+        displaySpecialEnemies();
         moveBullets();
         displayBullets();
-//        detectCollision();
+        detectCollision();
+        displayScore();
     }
     
 
