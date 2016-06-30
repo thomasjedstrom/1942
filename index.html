@@ -91,8 +91,8 @@
     6.  get another type of enemy to display - DONE
     7.  if hero colides with enemy, lose 500 points - DONE
     8.  when enemy gets shot, score goes up 10 points - DONE
+    9.  when enemy gets shot, it blows up - DONE
     
-    9.  when enemy gets shot, it blows up
     10. trigger explosion noise when enemy blows up
 
 
@@ -252,12 +252,38 @@
         for(var i=0; i<enemies.length; i++){
             if(Math.abs(enemies[i].x - hero.x) < 10 && Math.abs(enemies[i].y - hero.y) < 10){
                 score -= 500;
+                var mydiv = document.createElement("div");
+                mydiv.style.top = enemies[i].y+"px";
+                mydiv.style.left = enemies[i].x+"px";
+                mydiv.className = "explosions1";
+
+                document.getElementById('explosions').appendChild(mydiv);
+
+                setTimeout(function() {
+                    mydiv.parentNode.removeChild(mydiv);
+                }, 800);
+                enemies.splice(i, 1);
+                document.getElementById('hero').remove();
+                stopGame();
             }
         }
 //        SPECIAL ENEMIES & HERO
         for(var i=0; i<specialenemies.length; i++){
             if(Math.abs(specialenemies[i].x - hero.x) < 10 && Math.abs(specialenemies[i].y - hero.y) < 10){
                 score -= 500;
+                var mydiv = document.createElement("div");
+                mydiv.style.top = specialenemies[i].y+"px";
+                mydiv.style.left = specialenemies[i].x+"px";
+                mydiv.className = "explosions1";
+
+                document.getElementById('explosions').appendChild(mydiv);
+
+                setTimeout(function() {
+                    mydiv.parentNode.removeChild(mydiv);
+                }, 800);
+                specialenemies.splice(i, 1);
+                document.getElementById('hero').remove();
+                stopGame();
             }
         }
     }
@@ -298,8 +324,19 @@
 
     
     
+
     
-    setInterval(gameLoop, 30);
+    
+    
+    var myGame = setInterval(gameLoop, 30);
+    myGame();
+
+
+    function stopGame() {
+        clearInterval(myGame);
+    }
+
+    
     
     
     
